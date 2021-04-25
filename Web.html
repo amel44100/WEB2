@@ -1,0 +1,173 @@
+Web.html
+
+Type
+HTML
+Taille
+4 Ko (4 600 octets)
+Espace de stockage utilisé
+4 Ko (4 600 octets)
+Emplacement
+Codepenamel
+Propriétaire
+moi
+Modification :
+24 avr. 2021 par moi
+Dernière ouverture :
+le 21:15 par moi
+Date de création :
+24 avr. 2021 avec Google Drive Web
+Ajouter une description
+Téléchargement autorisé pour les lecteurs
+<html>
+<head>
+	
+	<title></title>
+	        <meta charset="utf-8" />
+	<meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<script src='https://api.mapbox.com/mapbox-gl-js/v0.44.0/mapbox-gl.js'></script>
+	<link href='https://api.mapbox.com/mapbox-gl-js/v0.44.0/mapbox-gl.css' rel='stylesheet' />
+	<style>
+	@charset "UTF-8";
+    	body { margin:0; padding:0; }
+    	h17, h18 {
+        	margin: 10px;
+        	font-size: 1.2em;
+    	}
+    	h18 {
+        	font-size: 1em;
+    	}
+    	p {
+        	font-size: 0.85em;
+        	margin: 10px;
+        	text-align: left;
+    	}
+    	.mapok-overlay {
+        	position: absolute;
+        	bottom: 0;
+        	right: 0;
+        	background: rgba(255, 255, 255, 0.8);
+        	margin-right: 20px;
+        	font-family: Arial, sans-serif;
+        	overflow: auto;
+        	border-radius: 3px;
+    	}
+    	#mapok {
+        	position:absolute;
+        	top:0;
+        	bottom:0;
+        	width:100%;
+    	}
+    	#featuresok {
+        	top: 0;
+        	height: 150px;
+        	margin-top: 20px;
+        	width: 250px;
+    	}
+    	#legendok {
+        	padding: 22px;
+        	box-shadow: 0 1px 2px rgba(0,0,0,0.10);
+        	line-height: 2Opx;
+        	height: 115px;
+        	margin-bottom: 308px;
+        	width: 200px;
+   		 background-color: #f0f0f5;
+    	}
+    	.legendok-key {
+        	display:inline-block;
+        	border-radius: 20%;
+        	width: 10px;
+        	height: 10px;
+        	margin-right: 5px;
+    	}
+	</style>
+</head>
+<body>
+ 
+<div id='mapok'></div>
+<div class='mapok-overlay' id='featuresok'><h17>Explorer les communes</h17><div id='pd'><p> <b>Survolez les communnes</b> </p></div></div>
+<div class='mapok-overlay' id='legendok'><b>Niveau d'équipement</b> <BR> </div>
+ 
+<script>
+// define access token
+mapboxgl.accessToken = 'pk.eyJ1IjoibWVsNDQxMDAiLCJhIjoiY2tnY2RpMzdlMDNubjJ0czFvaXJwdm42aSJ9.1vPFgr4n0D_sefGYpRU8yA';
+//Configuration de la carte
+var mapok = new mapboxgl.Map({
+	container: 'mapok', // container id
+	style: 'mapbox://styles/mapbox/light-v9', // map style URL from Mapbox Studio
+    center: [-3.788, 48.216],
+    zoom :9,
+    pitch: 40,
+    bearing: -20
+});
+// Configuration légende
+mapok.on('load', function() {
+	mapok.getCanvas().style.cursor = 'default';
+	mapok.getCanvas().style.cursor = 'default';
+	var layers = ['Pas de spots/ Communes pas', 'Bien', 'Assez Bien', 'Très Bien'];
+	var colors = ['#DCDCDC', '#E53535', '#FEB24C', '#35E564', '#FC4E2A', '#E31A1C', '#BD0026', '#800026'];
+	for (i=0; i<layers.length; i++) {
+    	var layer = layers[i] + "  équipé";
+    	var color = colors[i];
+    	var item = document.createElement('div');
+    	var key = document.createElement('span');
+    	key.className = 'legendok-key';
+    	key.style.backgroundColor = color;
+    	var value = document.createElement('span');
+    	value.innerHTML = layer;
+    	item.appendChild(key);
+    	item.appendChild(value);
+    	legendok.appendChild(item);
+
+	}
+    // Ajout de la source
+    mapok.addSource('Communes', {
+    	type: 'vector',
+    	url: 'mapbox://mel44100.502dvduj'
+	});
+    // Configuration couche communes
+mapok.addLayer({
+    	'id': 'Communes',
+    	'type': 'fill',
+    	'source': 'Communes',
+    	'source-layer': 'spot-2y0oyi',
+    	'layout': {'visibility': 'visible'},
+   	 'paint': {'fill-outline-color': '#000000',
+             	'fill-color': {
+              	property: 'TOTAL',
+              	stops: [
+                	[20, '#DCDCDC'],
+                	[30, '#E53535'],
+                	[50, '#FEB24C'],
+                	[100, '#35E564'],
+                	[200, '#FC4E2A'],
+                	[300, '#E31A1C'],
+   				 [500, '#BD0026'],
+   				 [1000, '#800026'],]},
+             	'fill-opacity': 0.8}
+});
+    
+	// Configuration fenêtre d'informations
+   mapok.on('mousemove', function (e) {
+        var states = mapok.queryRenderedFeatures(e.point, {
+            layers: ['Communes']
+        });
+        if (states.length > 0) {
+            document.getElementById('pd').innerHTML = "<h18><strong>" + states[0].properties.com_name_lo + "</strong></h18><p><strong><em>" + states[0].properties.TOTAL + "</strong> sur 70 (notation du nombre d'équipement)</em></p>"
+			+ "</strong></h18><p><strong><em>" + states[0].properties.com_type + "</strong> </p>";
+        } else {
+            document.getElementById('pd').innerHTML = '<p>Données : OSM/MAPBOX</p>';
+        }
+    });
+});
+</script>
+ 
+</body>
+</html>
+ 
+ 
+ 
+ 
+ 
+ 
+ 
